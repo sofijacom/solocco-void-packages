@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: 'Package to build (zen-browser-bin / google-chrome-bin / helium-browser-bin / mayulite-nerd-font / all)'
+        description: 'Package to build (zen-browser-bin / google-chrome-bin / helium-browser-bin / mayulite-nerd-font / brave-origin-beta / all)'
         required: false
         default: 'all'
         type: string
@@ -445,6 +445,123 @@ jobs:
           cd /tmp/repo
           ls -t mayulite-nerd-font-*.xbps 2>/dev/null | tail -n +2 | xargs -r rm -f
           ls -t mayulite-nerd-font-*.xbps.sig2 2>/dev/null | tail -n +2 | xargs -r rm -f
+          for sig in *.xbps.sig2; do
+            [ -f "${sig%.sig2}" ] || rm -f "$sig"
+          done
+
+      - name: Sign and Index
+        env:
+          PRIV_KEY: ${{ secrets.PRIV_KEY }}
+        run: |
+          export PATH="/opt/xbps/usr/bin/:$PATH"
+          cd /tmp/repo
+          rm -f x86_64-repodata
+          echo "$PRIV_KEY" > private.pem
+          xbps-rindex -a *.xbps
+          xbps-rindex -s --signedby "solocco" --privkey private.pem $PWD
+          xbps-rindex -S --privkey private.pem *.xbps
+          rm private.pem
+
+      - name: Upload to permanent release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create repo-latest \
+            --repo ${{ github.repository }} \
+            --title "solocco-void-packages" \
+            --notes "Permanent repository release. Files are updated automatically on each build." \
+            --latest 2>/dev/null || true
+          sleep 3
+          for f in /tmp/repo/*; do
+            gh release upload repo-latest \
+              --repo ${{ github.repository }} \
+              --clobber \
+              "$f" || true
+          done
+
+  # ==================== BRAVE ORIGIN BETA ====================
+  build-brave-origin-beta:
+    name: Build brave-origin-beta
+    if: |
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.package == 'brave-origin-beta' || github.event.inputs.package == 'all')) ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, 'brave-origin-beta'))
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/void-linux/void-glibc-full
+      options: --privileged
+      volumes:
+        - /dev:/dev
+      env:
+        ARCH: x86_64
+        BOOTSTRAP: x86_64
+        TEST: 0
+    steps:
+      - name: Prepare container
+        run: |
+          mkdir -p /etc/xbps.d && cp /usr/share/xbps.d/*-repository-*.conf /etc/xbps.d/
+          sed -i 's|repo-default|repo-ci|g' /etc/xbps.d/*-repository-*.conf
+          xbps-install -Syu xbps && xbps-install -yu && xbps-install -y sudo bash curl git rpmextract
+          curl -fsSL https://github.com/cli/cli/releases/download/v2.67.0/gh_2.67.0_linux_amd64.tar.gz | tar -xz -C /tmp
+          install -m755 /tmp/gh_2.67.0_linux_amd64/bin/gh /usr/local/bin/gh
+          useradd -G xbuilder -M builder
+          echo "builder ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/builder
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          path: main-repo
+
+      - name: Checkout void-packages
+        uses: actions/checkout@v4
+        with:
+          repository: void-linux/void-packages
+          path: void-packages
+
+      - name: Merge templates
+        id: info
+        run: |
+          cp -rv main-repo/srcpkgs/brave-origin-beta void-packages/srcpkgs/
+          chown -R builder:builder void-packages
+          BRAVE_VER=$(grep '^version=' main-repo/srcpkgs/brave-origin-beta/template | cut -d= -f2 | tr -d '"')
+          echo "brave_version=$BRAVE_VER" >> $GITHUB_OUTPUT
+
+      - name: Prepare masterdir
+        run: |
+          cd void-packages
+          sudo -Eu builder common/travis/set_mirror.sh
+          sudo -Eu builder common/travis/prepare.sh
+          common/travis/fetch-xtools.sh
+
+      - name: Build brave-origin-beta
+        run: |
+          export PATH="/opt/xbps/usr/bin/:$PATH"
+          cd void-packages
+          mkdir -p common/conf
+          echo "XBPS_ALLOW_RESTRICTED=yes" | sudo tee -a common/conf/make.conf
+          sudo -Eu builder ./xbps-src -j$(nproc) pkg brave-origin-beta
+
+      - name: Download existing repo from release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/repo
+          gh release download repo-latest \
+            --repo ${{ github.repository }} \
+            --dir /tmp/repo \
+            --pattern "*.xbps" \
+            --pattern "*.xbps.sig2" \
+            --pattern "x86_64-repodata" || echo "No existing release found, starting fresh"
+
+      - name: Merge new packages into repo
+        run: |
+          find void-packages/hostdir/binpkgs -name "*.xbps" -exec cp -f {} /tmp/repo/ \;
+          find void-packages/hostdir/binpkgs -name "*.xbps.sig2" -exec cp -f {} /tmp/repo/ \;
+
+      - name: Cleanup old versions
+        run: |
+          cd /tmp/repo
+          ls -t brave-origin-beta-*.xbps 2>/dev/null | tail -n +2 | xargs -r rm -f
+          ls -t brave-origin-beta-*.xbps.sig2 2>/dev/null | tail -n +2 | xargs -r rm -f
           for sig in *.xbps.sig2; do
             [ -f "${sig%.sig2}" ] || rm -f "$sig"
           done

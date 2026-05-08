@@ -112,3 +112,29 @@ jobs:
           message: "Update mayulite-nerd-font to ${{ env.NEW_VERSION }}"
           add: 'srcpkgs/mayulite-nerd-font/template'
           github_token: ${{ secrets.PAT_TOKEN }}
+
+  # ==================== BRAVE ORIGIN BETA ====================
+  update-brave-origin-beta:
+    name: Check brave-origin-beta updates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Run update script
+        id: update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x scripts/update-brave-origin-beta.sh
+          ./scripts/update-brave-origin-beta.sh
+
+      - name: Commit and push
+        if: env.NEW_VERSION != ''
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update brave-origin-beta to ${{ env.NEW_VERSION }}"
+          add: 'srcpkgs/brave-origin-beta/template'
+          github_token: ${{ secrets.PAT_TOKEN }}
