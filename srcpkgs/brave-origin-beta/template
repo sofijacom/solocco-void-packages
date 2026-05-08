@@ -14,8 +14,8 @@ distfiles="https://github.com/brave/brave-browser/releases/download/v${version}/
 checksum="746f18e90ca8c9f07bb7428aed26cebe991a1b443de060be8590c08476654f49"
 
 do_install() {
-	rm -f etc/cron.daily/brave-browser
+	rm -f etc/cron.daily/brave-origin-beta
 	vcopy "*" /
 	vmkdir usr/share/pixmaps
-	vinstall opt/brave.com/brave-beta/product_logo_128.png 644 usr/share/pixmaps brave-origin-beta.png
+	vinstall opt/brave.com/brave-origin-beta/product_logo_128_beta.png 644 usr/share/pixmaps brave-origin-beta.png
 }
