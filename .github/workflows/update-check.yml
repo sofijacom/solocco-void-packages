@@ -29,7 +29,10 @@ jobs:
 
       - name: Pull latest changes
         if: env.NEW_VERSION != ''
-        run: git pull --rebase origin main
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
@@ -61,7 +64,10 @@ jobs:
 
       - name: Pull latest changes
         if: env.NEW_VERSION != ''
-        run: git pull --rebase origin main
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
@@ -93,7 +99,10 @@ jobs:
 
       - name: Pull latest changes
         if: env.NEW_VERSION != ''
-        run: git pull --rebase origin main
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
@@ -125,7 +134,10 @@ jobs:
 
       - name: Pull latest changes
         if: env.NEW_VERSION != ''
-        run: git pull --rebase origin main
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
@@ -157,7 +169,10 @@ jobs:
 
       - name: Pull latest changes
         if: env.NEW_VERSION != ''
-        run: git pull --rebase origin main
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
