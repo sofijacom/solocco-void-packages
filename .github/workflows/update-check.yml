@@ -27,6 +27,10 @@ jobs:
           chmod +x scripts/update-zen-browser-bin.sh
           ./scripts/update-zen-browser-bin.sh
 
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: git pull --rebase origin main
+
       - name: Commit and push
         if: env.NEW_VERSION != ''
         uses: EndBug/add-and-commit@v9
@@ -38,6 +42,8 @@ jobs:
   # ==================== GOOGLE CHROME ====================
   update-google-chrome-bin:
     name: Check google-chrome-bin updates
+    needs: update-zen-browser-bin
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,6 +59,10 @@ jobs:
           chmod +x scripts/update-google-chrome-bin.sh
           ./scripts/update-google-chrome-bin.sh
 
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: git pull --rebase origin main
+
       - name: Commit and push
         if: env.NEW_VERSION != ''
         uses: EndBug/add-and-commit@v9
@@ -64,6 +74,8 @@ jobs:
   # ==================== HELIUM BROWSER ====================
   update-helium-browser-bin:
     name: Check helium-browser-bin updates
+    needs: update-google-chrome-bin
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -79,6 +91,10 @@ jobs:
           chmod +x scripts/update-helium-browser-bin.sh
           ./scripts/update-helium-browser-bin.sh
 
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: git pull --rebase origin main
+
       - name: Commit and push
         if: env.NEW_VERSION != ''
         uses: EndBug/add-and-commit@v9
@@ -90,6 +106,8 @@ jobs:
   # ==================== MAYULITE NERD FONT ====================
   update-mayulite-nerd-font:
     name: Check mayulite-nerd-font updates
+    needs: update-helium-browser-bin
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -105,6 +123,10 @@ jobs:
           chmod +x scripts/update-mayulite-nerd-font.sh
           ./scripts/update-mayulite-nerd-font.sh
 
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: git pull --rebase origin main
+
       - name: Commit and push
         if: env.NEW_VERSION != ''
         uses: EndBug/add-and-commit@v9
@@ -116,6 +138,8 @@ jobs:
   # ==================== BRAVE ORIGIN BETA ====================
   update-brave-origin-beta:
     name: Check brave-origin-beta updates
+    needs: update-mayulite-nerd-font
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -130,6 +154,10 @@ jobs:
         run: |
           chmod +x scripts/update-brave-origin-beta.sh
           ./scripts/update-brave-origin-beta.sh
+
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: git pull --rebase origin main
 
       - name: Commit and push
         if: env.NEW_VERSION != ''
