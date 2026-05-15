@@ -11,18 +11,10 @@ if [ ! -f "$TPL" ]; then
     exit 1
 fi
 
-# ✅ Fix 1: prerelease == true for beta releases
-# ✅ Fix 2: use any() to safely check assets
-LATEST_VERSION=$(gh api "repos/$REPO/releases" \
-    --jq '[.[] | select(.prerelease == true) | select(any(.assets[]; .name | test("brave-origin-beta.*x86_64\\.rpm")))] | first | .tag_name' \
+# Cari release yang punya aset brave-origin-beta RPM (exact match, bukan .sha256 dll)
+LATEST_VERSION=$(gh api "repos/$REPO/releases?per_page=50" \
+    --jq '[.[] | select(any(.assets[]; .name | test("brave-origin-beta.*x86_64\\.rpm$")))] | first | .tag_name' \
     | sed 's/^v//')
-
-# Fallback: scan more releases (gh api paginates to 30 by default)
-if [ -z "$LATEST_VERSION" ]; then
-    LATEST_VERSION=$(gh api "repos/$REPO/releases?per_page=50" \
-        --jq '[.[] | select(any(.assets[]; .name | test("brave-origin-beta.*x86_64\\.rpm")))] | first | .tag_name' \
-        | sed 's/^v//')
-fi
 
 if [ -z "$LATEST_VERSION" ]; then
     echo "Error: Failed to fetch latest version."
@@ -45,9 +37,9 @@ fi
 
 echo "Update found: $CURRENT_VERSION -> $LATEST_VERSION"
 
-# ✅ Fix 3: Get the EXACT asset URL from the release instead of constructing it
-URL=$(gh api "repos/$REPO/releases" \
-    --jq "[.[] | select(.tag_name == \"v${LATEST_VERSION}\")] | first | .assets[] | select(.name | test(\"brave-origin-beta.*x86_64\\\\.rpm\")) | .browser_download_url")
+# Ambil URL langsung dari API, hanya file .rpm (bukan .sha256 atau .asc)
+URL=$(gh api "repos/$REPO/releases?per_page=50" \
+    --jq "[.[] | select(.tag_name == \"v${LATEST_VERSION}\")] | first | .assets[] | select(.name | test(\"brave-origin-beta.*x86_64\\\\.rpm$\")) | .browser_download_url")
 
 if [ -z "$URL" ]; then
     echo "Error: RPM asset not found in release v${LATEST_VERSION}."
