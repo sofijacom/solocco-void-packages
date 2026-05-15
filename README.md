@@ -5,7 +5,7 @@ echo "repository=https://github.com/solocco/solocco-void-packages/releases/lates
 
 wes awuren dewe
 
-auto update
+auto update - cek release
 
 
 ## Maintainer
