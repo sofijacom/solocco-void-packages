@@ -1,6 +1,6 @@
 # Template file for 'mayulite-nerd-font'
 pkgname=mayulite-nerd-font
-version=34.5.0
+version=34.6.1
 revision=1
 depends="font-util"
 short_desc="Mayulite Nerd Font - Patched Mayulite font with Nerd Font icons"
@@ -8,7 +8,7 @@ maintainer="solocco"
 license="OFL-1.1"
 homepage="https://github.com/solocco/mayulite-font"
 distfiles="https://github.com/solocco/mayulite-font/releases/download/v${version}/MayuliteNerdFont-TTF.tar.xz"
-checksum=ab9f238be7262051dc31ec2b96864be62e07ef319b129150634b01de69d8a969
+checksum=477941daf7cc21432da95921d48eb69ff68bc911a4942f1010f330dd06751900
 font_dirs="/usr/share/fonts/TTF"
 provides="font:monospace-0_1"
 
