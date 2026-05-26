@@ -217,3 +217,38 @@ jobs:
           add: 'srcpkgs/iosevka-nf/template'
           github_token: ${{ secrets.PAT_TOKEN }}
 
+  # ==================== IOSEVKA ORI ====================
+  update-iosevka-ori:
+    name: Check iosevka-ori updates
+    needs: update-iosevka-nf
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Run update script
+        id: update
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x scripts/update-iosevka-ori.sh
+          ./scripts/update-iosevka-ori.sh
+
+      - name: Pull latest changes
+        if: env.NEW_VERSION != ''
+        run: |
+          git stash
+          git pull --rebase origin main
+          git stash pop
+
+      - name: Commit and push
+        if: env.NEW_VERSION != ''
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: "Update iosevka-ori to ${{ env.NEW_VERSION }}"
+          add: 'srcpkgs/iosevka-ori/template'
+          github_token: ${{ secrets.PAT_TOKEN }}
+
