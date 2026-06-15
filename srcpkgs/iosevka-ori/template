@@ -1,5 +1,5 @@
 pkgname=iosevka-ori
-version=34.6.1
+version=34.6.3
 revision=1
 depends="font-util"
 short_desc="Iosevka original styles (Regular, Italic, Medium, Bold)"
@@ -7,7 +7,7 @@ maintainer="solocco"
 license="OFL-1.1"
 homepage="https://github.com/solocco/iosevka-nf"
 distfiles="https://github.com/solocco/iosevka-nf/releases/download/v${version}/Iosevka-TTF-${version}.tar.xz"
-checksum="ff5620ec053b56cc26f1ac82c3d7d18cd4348ec11f97d9a6afe3c9d322c785a5"
+checksum=0a6a9ca034604ae1ec0ec94be8128794fa3e550e3a2bfb730b548a440444015f
 font_dirs="/usr/share/fonts/TTF"
 provides="font:monospace-0_1"
 
