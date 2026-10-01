@@ -111,14 +111,14 @@
     {
       "package": "mayulite-bin",
       "restricted": false,
-      "build": false,
+      "build": true,
       "strategy": "font",
       "font": "Mayulite"
     },
     {
       "package": "runesevka-bin",
       "restricted": false,
-      "build": true,
+      "build": false,
       "strategy": "font",
       "font": "Runesevka"
     },
