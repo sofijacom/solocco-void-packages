@@ -1,5 +1,5 @@
 pkgname=mayulite-bin
-version=34.8.0
+version=34.9.0
 revision=1
 depends="font-util"
 short_desc="Mayulite TTF and Nerd Font"
@@ -8,8 +8,8 @@ license="OFL-1.1"
 homepage="https://github.com/solocco/my-fonts"
 distfiles="https://github.com/solocco/my-fonts/releases/download/Mayulite-v${version}/Mayulite-TTF.tar.xz
  https://github.com/solocco/my-fonts/releases/download/Mayulite-v${version}/Mayulite-NerdFont.tar.xz"
-checksum="57b639e573e64638d8c8b81d0f4e9eec3563fec6f6936b0caa3ad364e4e2479d
- 6f8801100e9740d2a32186d3c5b5cca08bf6292932eedf2e188f525d31d63987"
+checksum="c9ad4135bb6266aeaf7ed0ea8ac5a7106e0ee0578ad36ae87559e9019ded7a88
+ ea2bf74b93c2b8d59fa62b89f14a69904d5a1bfccfd02245e2758329a0360c30"
 font_dirs="/usr/share/fonts/TTF"
  
 do_install() {
